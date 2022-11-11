@@ -1,16 +1,12 @@
 import discord
-from discord.ui import Select, View
-from discord import SelectOption
+import asyncio
+from bot_utils import TOKEN
 from discord.ext import commands
-from bot_utils import TOKEN, GUILD_ID
-from drapeau import *
 
 import logging
 from random import choice
 #from discord.client import _ColourFormatter
 from time import sleep
-
-guild = discord.Object(id=GUILD_ID)
 
 log = logging.getLogger("UwU")
 log.setLevel(logging.DEBUG)
@@ -27,26 +23,29 @@ bot = commands.Bot(
     intents = intents
 )
 
+# Load cogs
+initial_extensions = [
+    "cogs.drapeau",
+]
+
+print(initial_extensions)
+
+
 @bot.event
 async def on_ready():
     log.info(f"Connecté en tant que {bot.user}")
-    await bot.tree.sync(guild=guild)
+    # await bot.tree.sync(guild=guild)
 
+async def load():
+    for extension in initial_extensions:
+        try:
+            await bot.load_extension(extension)
+        except Exception as e:
+            log.error(f"Failed to load extension {extension}")
+            log.error(e)
 
-@bot.tree.command(name="drapeau", description="Fais deviner un unique drapeau", guild = guild)
-async def drapeau(interaction):
-    choix = drapeaux_aleatoires(2)
-    correct = choice(choix)
-    select = Select(
-        options = [
-            SelectOption(label=pays) 
-            for drapeau, pays in choix
-        ],
-        placeholder = "Sélectionne le pays correspondant au drapeau",
-    )
-    view = View()
-    view.add_item(select)
-    message = correct[0]
-    await interaction.response.send_message(message, view = view)
+async def main():
+    await load()
+    await bot.start(TOKEN)
 
-bot.run(TOKEN)
+asyncio.run(main())
