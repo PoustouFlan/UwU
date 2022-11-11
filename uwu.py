@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from bot_utils import TOKEN, GUILD_ID
+from flag import *
 
 import logging
 from discord.client import _ColourFormatter
@@ -28,7 +29,10 @@ bot = commands.Bot(
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user}")
+    log.info(f"Logged in as {bot.user}")
 
+@bot.tree.command(name="flag", description="devine un unique drapeau", guild = guild)
+async def flag(interaction):
+    
 
 bot.run(TOKEN)
