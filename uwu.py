@@ -26,6 +26,7 @@ bot = commands.Bot(
 # Load cogs
 initial_extensions = [
     "cogs.drapeau",
+    "cogs.survie",
 ]
 
 print(initial_extensions)
