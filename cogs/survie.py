@@ -61,7 +61,6 @@ class Select(discord.ui.Select):
                 ephemeral = True,
             )
 
-
 class SelectView(discord.ui.View):
     def __init__(self, choix, correct, interaction, streak = 0, vies = 1):
         super().__init__()
@@ -73,6 +72,13 @@ class Survie(commands.Cog):
     
     @app_commands.command(name="survie", description="Fais deviner des drapeaux tant qu'il vous reste des vies")
     async def survie(self, interaction, vies:int=1):
+        if vies > 10:
+            await interaction.response.send_message(
+                ":pensive: Le nombre de vies est limité à 10 au maximum !",
+                ephemeral = True
+            )
+            return
+
         choix = pays_aleatoires(25)
         correct = choice(choix)
         file = drapeau(correct[0])
