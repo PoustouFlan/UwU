@@ -101,5 +101,19 @@ class Survie(commands.Cog):
             ephemeral = True,
         )
 
+    @app_commands.command(name="continuer", description="Reprend une survie en cours de route")
+    async def continuer(self, interaction):
+
+        choix = pays_aleatoires(25)
+        correct = choice(choix)
+        file = drapeau(correct[0])
+        view = SelectView(choix, correct, interaction)
+        await interaction.response.send_message(
+            ":thinking: Quel est le pays correspondant à ce drapeau ?",
+            file = file,
+            view = view,
+            ephemeral = True,
+        )
+
 async def setup(bot):
     await bot.add_cog(Survie(bot), guilds = [guild])
