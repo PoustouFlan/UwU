@@ -41,15 +41,7 @@ class Select(discord.ui.Select):
     async def callback(self, interaction):
         user = interaction.user
         self.answers[user] = self.values[0]
-        #response = await self.interaction.original_response()
-        #message = f"{user.mention} a répondu {self.values[0]}"
-        #await response.edit(content = message)
-        try:
-            await interaction.response.defer()
-            print("Deferred")
-        except Exception as e:
-            print(e)
-
+        await interaction.response.defer()
 
 class SelectView(discord.ui.View):
     def __init__(self, choix):
@@ -79,7 +71,6 @@ class Drapeau(commands.Cog):
         )
         response = await interaction.original_response()
         await asyncio.sleep(10)
-        print("Results :", view.children[0].answers)
         answers = view.children[0].answers
         message = ""
         for user, answer in answers.items():
