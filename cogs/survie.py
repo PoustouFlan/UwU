@@ -33,7 +33,7 @@ class Select(discord.ui.Select):
             message = ":white_check_mark: Correct !"
             await response.edit(content = message, view = None)
 
-            choix = pays_aleatoires(15)
+            choix = pays_aleatoires(25)
             correct = choice(choix)
             file = drapeau(correct[0])
             view = SelectView(choix, correct, interaction, self.streak + 1)
@@ -47,11 +47,9 @@ class Select(discord.ui.Select):
 
         else:
             message = (f":x: Incorrect, la bonne réponse était {self.correct[1]} !\n" +
-                      f":fire: Streak : {self.streak} !")
+                      f":fire: **Streak :** {self.streak}")
             await response.edit(content = message, view = None)
 
-
-            
 
 class SelectView(discord.ui.View):
     def __init__(self, choix, correct, interaction, streak = 0):
@@ -64,7 +62,7 @@ class Survie(commands.Cog):
     
     @app_commands.command(name="survie", description="Fais deviner des drapeaux tant que la réponse est correcte")
     async def survie(self, interaction):
-        choix = pays_aleatoires(15)
+        choix = pays_aleatoires(25)
         correct = choice(choix)
         file = drapeau(correct[0])
         view = SelectView(choix, correct, interaction)

@@ -88,7 +88,7 @@ class Drapeau(commands.Cog):
             else:
                 message += ":x: | "
             emote = f":flag_{CODE[answer].lower()}:"
-            message += f"{user.mention} a répondu {emote} {answer}\n"
+            message += f"{user.mention} a répondu : {emote} {answer}\n"
 
         message += f":information_source: | La bonne réponse était {correct[1]}!"
         await response.edit(
