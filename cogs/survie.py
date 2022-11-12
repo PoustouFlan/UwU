@@ -42,7 +42,8 @@ class Select(discord.ui.Select):
 
         if vies <= 0:
             message += ":pensive: Vous êtes à court de vies !\n"
-            message += f":fire: Vous avez correctement trouvé {streak} drapeaux !\n"
+            x = "" if streak < 2 else "x"
+            message += f":fire: Vous avez correctement trouvé {streak} drapeau{x} !\n"
             await response.edit(content = message, view = None)
 
         else:
