@@ -7,6 +7,7 @@ import json
 from random import choice, sample
 
 from time import sleep
+import asyncio
 
 with open("pays.json", "r") as file:
     pays = json.load(file)
@@ -23,9 +24,8 @@ def drapeau(code: str):
     return discord.File(file, filename="drapeau.png")
 
 class Select(discord.ui.Select):
-    def __init__(self, interaction, choix, correct):
-        self.correct = correct
-        self.interaction = interaction
+    def __init__(self, choix):
+        self.answers = {}
         pays = sorted(element[1] for element in choix)
         options = [
             discord.SelectOption(label=nom) for nom in pays
@@ -40,19 +40,21 @@ class Select(discord.ui.Select):
     
     async def callback(self, interaction):
         user = interaction.user
-        response = await self.interaction.original_response()
-        message = f"{user.mention} a répondu {self.values[0]}:\n"
-        if self.values[0] == self.correct[1]:
-            message += ":white_check_mark: Bonne réponse !"
-        else:
-            message += f":x: Mauvaise réponse ! Il s'agissait de {self.correct[1]}."
-        await response.edit(content = message, view = None)
+        self.answers[user] = self.values[0]
+        #response = await self.interaction.original_response()
+        #message = f"{user.mention} a répondu {self.values[0]}"
+        #await response.edit(content = message)
+        try:
+            await interaction.response.defer()
+            print("Deferred")
+        except Exception as e:
+            print(e)
 
 
 class SelectView(discord.ui.View):
-    def __init__(self, interaction, choix, correct):
+    def __init__(self, choix):
         super().__init__()
-        self.add_item(Select(interaction, choix, correct))
+        self.add_item(Select(choix))
 
 class Drapeau(commands.Cog):
     def __init__(self, bot):
@@ -69,16 +71,29 @@ class Drapeau(commands.Cog):
         choix = pays_aleatoires(15)
         correct = choice(choix)
         file = drapeau(correct[0])
-        view = SelectView(interaction, choix, correct)
+        view = SelectView(choix)
         await interaction.response.send_message(
-            "Préparez vous, drapeau dans 3 secondes !",
+            "Quel est le pays correspondant à ce drapeau ?",
+            file = file,
+            view = view,
         )
         response = await interaction.original_response()
-        sleep(3)
+        await asyncio.sleep(10)
+        print("Results :", view.children[0].answers)
+        answers = view.children[0].answers
+        message = ""
+        for user, answer in answers.items():
+            if answer == correct[1]:
+                message += ":white_check_mark: | "
+            else:
+                message += ":x: | "
+            message += f"{user.mention} a répondu {answer}\n"
+        
+        message += f":information_source: | La bonne réponse était {correct[1]}!"
+        
         await response.edit(
-            content = "Quel est le pays correspondant à ce drapeau ?",
-            attachments = [file],
-            view = view,
+            content = message,
+            view = None,
         )
 
 async def setup(bot):
