@@ -103,6 +103,14 @@ class Survie(commands.Cog):
 
     @app_commands.command(name="continuer", description="Reprend une survie en cours de route")
     async def continuer(self, interaction):
+        id = interaction.user.id
+        vies = donnee(id, "VIES")
+        if vies <= 0:
+            await interaction.response.send_message(
+                ":x: Vous n'avez pas de survie en cours !",
+                ephemeral = True
+            )
+            return
 
         choix = pays_aleatoires(25)
         correct = choice(choix)
