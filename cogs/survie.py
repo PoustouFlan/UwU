@@ -30,7 +30,6 @@ class Select(discord.ui.Select):
     async def callback(self, interaction):
         response = await self.interaction.original_response()
         if self.values[0] == self.correct[1]:
-            print("Correct")
             message = ":white_check_mark: Correct !"
             await response.edit(content = message, view = None)
 

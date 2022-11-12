@@ -11,6 +11,10 @@ import asyncio
 
 with open("pays.json", "r") as file:
     pays = json.load(file)
+
+CODE = {}
+for cd, py in pays.items():
+    CODE[py] = cd
     
 def pays_aleatoires(n: int):
     """
@@ -68,7 +72,7 @@ class Drapeau(commands.Cog):
         file = drapeau(correct[0])
         view = SelectView(choix)
         await interaction.response.send_message(
-            "Quel est le pays correspondant à ce drapeau ?",
+            ":thinking: Quel est le pays correspondant à ce drapeau ?",
             file = file,
             view = view,
         )
@@ -83,7 +87,8 @@ class Drapeau(commands.Cog):
                 message += ":white_check_mark: | "
             else:
                 message += ":x: | "
-            message += f"{user.mention} a répondu {answer}\n"
+            emote = f":flag_{CODE[answer].lower()}:"
+            message += f"{user.mention} a répondu {emote} {answer} {emote})\n"
 
         message += f":information_source: | La bonne réponse était {correct[1]}!"
         await response.edit(
