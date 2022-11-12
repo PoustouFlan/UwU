@@ -26,14 +26,17 @@ def drapeaux_aleatoires(n: int):
 class Select(discord.ui.Select):
     def __init__(self, choix):
         options = [
-            SelectOption(label=pays) 
+            discord.SelectOption(label=pays) 
             for drapeau, pays in choix
-        ],
-        placeholder = "Sélectionne le pays correspondant au drapeau",
+        ]
+        placeholder = "Sélectionne le pays correspondant au drapeau"
         super().__init__(
             placeholder=placeholder,
             options=options
         )
+    
+    async def callback(self, interaction):
+        pass
 
 class SelectView(discord.ui.View):
     def __init__(self, choix):
