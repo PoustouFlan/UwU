@@ -60,12 +60,6 @@ class Drapeau(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command()
-    async def sync(self, ctx):
-        fmt = await ctx.bot.tree.sync(guild=ctx.guild)
-        s = "" if fmt < 2 else "s"
-        await ctx.send(f"{len(fmt)} commande{s} synchronisée{s}.")
-    
     @app_commands.command(name="drapeau", description="Fais deviner un unique drapeau")
     async def drapeau(self, interaction):
         choix = pays_aleatoires(15)

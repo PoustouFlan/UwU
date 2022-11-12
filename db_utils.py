@@ -54,7 +54,27 @@ def total(id, conn = None):
     if to_close:
         conn.close()
     return value
+
+def donnees(conn = None):
+    to_close = conn is None
+    if to_close:
+        conn = connection()
     
+    cursor = conn.execute(
+        """
+            SELECT ID, TOTAL, CORRECT from USERS
+        """
+    )
+
+    for row in cursor:
+        yield {
+            "id": row[0],
+            "total": row[1],
+            "correct": row[2]
+        }
+    
+    if to_close:
+        conn.close()
 
 def correct(id, conn = None):
     to_close = conn is None
@@ -111,3 +131,4 @@ def increment_correct(id, conn = None):
 
     if to_close:
         conn.close()
+

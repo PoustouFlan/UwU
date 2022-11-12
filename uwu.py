@@ -27,6 +27,7 @@ bot = commands.Bot(
 initial_extensions = [
     "cogs.drapeau",
     "cogs.survie",
+    "cogs.scoreboard",
 ]
 
 print(initial_extensions)
