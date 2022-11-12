@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from bot_utils import guild
+from db_utils import increment_correct, increment_total
 import json
 from random import choice, sample
 
@@ -83,8 +84,10 @@ class Drapeau(commands.Cog):
         message = ""
 
         for user, answer in answers.items():
+            increment_total(user.id)
             if answer == correct[1]:
                 message += ":white_check_mark: | "
+                increment_correct(user.id)
             else:
                 message += ":x: | "
             emote = f":flag_{CODE[answer].lower()}:"
