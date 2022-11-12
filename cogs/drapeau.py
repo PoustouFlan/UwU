@@ -6,6 +6,8 @@ from bot_utils import guild
 import json
 from random import choice, sample
 
+from time import sleep
+
 with open("pays.json", "r") as file:
     pays = json.load(file)
     
@@ -39,12 +41,13 @@ class Select(discord.ui.Select):
     async def callback(self, interaction):
         user = interaction.user
         response = await self.interaction.original_response()
-        message = f"Réponse de {user.mention} :\n"
+        message = f"{user.mention} a répondu {self.values[0]}:\n"
         if self.values[0] == self.correct[1]:
-            message += "Bonne réponse !"
+            message += ":white_check_mark: Bonne réponse !"
         else:
-            message += f"Mauvaise réponse ! Il s'agissait de {self.correct[1]}."
+            message += f":x: Mauvaise réponse ! Il s'agissait de {self.correct[1]}."
         await response.edit(content = message, view = None)
+
 
 class SelectView(discord.ui.View):
     def __init__(self, interaction, choix, correct):
@@ -65,10 +68,17 @@ class Drapeau(commands.Cog):
     async def drapeau(self, interaction):
         choix = pays_aleatoires(15)
         correct = choice(choix)
+        file = drapeau(correct[0])
+        view = SelectView(interaction, choix, correct)
         await interaction.response.send_message(
-            "Quel est le pays correspondant à ce drapeau ?",
-            file = drapeau(correct[0]),
-            view = SelectView(interaction, choix, correct),
+            "Préparez vous, drapeau dans 3 secondes !",
+        )
+        response = await interaction.original_response()
+        sleep(3)
+        await response.edit(
+            content = "Quel est le pays correspondant à ce drapeau ?",
+            attachments = [file],
+            view = view,
         )
 
 async def setup(bot):
