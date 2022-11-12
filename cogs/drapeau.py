@@ -21,8 +21,9 @@ def drapeau(code: str):
     return discord.File(file, filename="drapeau.png")
 
 class Select(discord.ui.Select):
-    def __init__(self, choix, correct):
+    def __init__(self, interaction, choix, correct):
         self.correct = correct
+        self.interaction = interaction
         pays = sorted(element[1] for element in choix)
         options = [
             discord.SelectOption(label=nom) for nom in pays
@@ -36,16 +37,19 @@ class Select(discord.ui.Select):
         )
     
     async def callback(self, interaction):
+        user = interaction.user
+        response = await self.interaction.original_response()
+        message = f"Réponse de {user.mention} :\n"
         if self.values[0] == self.correct[1]:
-            message = "Bonne résponse !"
+            message += "Bonne réponse !"
         else:
-            message = f"Mauvaise réponse ! Il s'agissait de {self.correct[1]}."
-        await interaction.response.send_message(message, ephemeral=False)            
+            message += f"Mauvaise réponse ! Il s'agissait de {self.correct[1]}."
+        await response.edit(content = message, view = None)
 
 class SelectView(discord.ui.View):
-    def __init__(self, choix, correct):
+    def __init__(self, interaction, choix, correct):
         super().__init__()
-        self.add_item(Select(choix, correct))
+        self.add_item(Select(interaction, choix, correct))
 
 class Drapeau(commands.Cog):
     def __init__(self, bot):
@@ -64,7 +68,7 @@ class Drapeau(commands.Cog):
         await interaction.response.send_message(
             "Quel est le pays correspondant à ce drapeau ?",
             file = drapeau(correct[0]),
-            view = SelectView(choix, correct),
+            view = SelectView(interaction, choix, correct),
         )
 
 async def setup(bot):
