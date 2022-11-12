@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from bot_utils import guild
+from db_utils import increment_correct, increment_total, increment_streak, decrement_vies, donnee, set_donnee
 from cogs.drapeau import pays_aleatoires, drapeau
 import json
 from random import choice, sample
@@ -11,11 +12,9 @@ from time import sleep
 import asyncio
 
 class Select(discord.ui.Select):
-    def __init__(self, choix, correct, interaction, streak = 0, vies = 1):
+    def __init__(self, choix, correct, interaction):
         self.interaction = interaction
         self.correct = correct
-        self.streak = streak
-        self.vies = vies
         pays = sorted(element[1] for element in choix)
         options = [
             discord.SelectOption(label=nom) for nom in pays
@@ -30,15 +29,20 @@ class Select(discord.ui.Select):
     
     async def callback(self, interaction):
         response = await self.interaction.original_response()
+        id = interaction.user.id
+        increment_total(id)
+
         if self.values[0] == self.correct[1]:
+            increment_correct(id)
+            increment_streak(id)
             message = ":white_check_mark: Correct !\n"
-            streak = self.streak + 1
-            vies = self.vies
 
         else:
             message = f":x: Incorrect, la bonne réponse était {self.correct[1]} !\n"
-            streak = self.streak
-            vies = self.vies - 1
+            decrement_vies(id)
+
+        vies = donnee(id, "VIES")
+        streak = donnee(id, "STREAK")
 
         if vies <= 0:
             message += ":pensive: Vous êtes à court de vies !\n"
@@ -52,7 +56,7 @@ class Select(discord.ui.Select):
             choix = pays_aleatoires(25)
             correct = choice(choix)
             file = drapeau(correct[0])
-            view = SelectView(choix, correct, interaction, streak, vies)
+            view = SelectView(choix, correct, interaction)
             await interaction.response.send_message(
                 f":thinking: Quel est le pays correspondant à ce drapeau ?\n" +
                 f":fire: Streak : {streak}\n" +
@@ -63,9 +67,9 @@ class Select(discord.ui.Select):
             )
 
 class SelectView(discord.ui.View):
-    def __init__(self, choix, correct, interaction, streak = 0, vies = 1):
+    def __init__(self, choix, correct, interaction):
         super().__init__()
-        self.add_item(Select(choix, correct, interaction, streak, vies))
+        self.add_item(Select(choix, correct, interaction))
 
 class Survie(commands.Cog):
     def __init__(self, bot):
@@ -80,10 +84,16 @@ class Survie(commands.Cog):
             )
             return
 
+        id = interaction.user.id
+
+        set_donnee(id, "START", vies)
+        set_donnee(id, "VIES", vies)
+        set_donnee(id, "STREAK", 0)
+
         choix = pays_aleatoires(25)
         correct = choice(choix)
         file = drapeau(correct[0])
-        view = SelectView(choix, correct, interaction, 0, vies)
+        view = SelectView(choix, correct, interaction)
         await interaction.response.send_message(
             ":thinking: Quel est le pays correspondant à ce drapeau ?",
             file = file,
