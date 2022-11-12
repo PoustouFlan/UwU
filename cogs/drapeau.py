@@ -6,28 +6,25 @@ from bot_utils import guild
 import json
 from random import choice, sample
 
-with open("drapeaux.json", "r") as file:
-    drapeaux = json.load(file)
+with open("pays.json", "r") as file:
+    pays = json.load(file)
     
-def drapeau_aleatoire():
+def pays_aleatoires(n: int):
     """
-    Retourne un drapeau aléatoire sous la forme d'un tuple
-    (Drapeau, Nom)
+    Retourne une liste de n pays aléatoires
     """
-    return choice(list(drapeaux.items()))
+    return sample(list(pays.items()), n)
 
-def drapeaux_aleatoires(n: int):
-    """
-    Retourne une liste de n drapeaux aleatoires
-    """
-    return sample(list(drapeaux.items()), n)
-
+def drapeau(code: str):
+    filename = f"drapeaux/{code.lower()}.png"
+    file = open(filename, 'rb')
+    return discord.File(file, filename="drapeau.png")
 
 class Select(discord.ui.Select):
     def __init__(self, choix):
+        pays = sorted(element[1] for element in choix)
         options = [
-            discord.SelectOption(label=pays) 
-            for drapeau, pays in choix
+            discord.SelectOption(label=nom) for nom in pays
         ]
         placeholder = "Sélectionne le pays correspondant au drapeau"
         super().__init__(
@@ -55,8 +52,10 @@ class Drapeau(commands.Cog):
     
     @app_commands.command(name="drapeau", description="Fais deviner un unique drapeau")
     async def drapeau(self, interaction):
-        choix = drapeaux_aleatoires(2)
-        await interaction.response.send_message("allo ?", view = SelectView(choix))
+        choix = pays_aleatoires(15)
+        correct = choice(choix)
+        file = drapeau(correct[0])
+        await interaction.response.send_message("", file = file, view = SelectView(choix))
 
 async def setup(bot):
     await bot.add_cog(Drapeau(bot), guilds = [guild])
