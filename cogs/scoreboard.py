@@ -22,25 +22,40 @@ class Scoreboard(commands.Cog):
             id = row['id']
             total = row['total']
             correct = row['correct']
+            survie = row['survie']
+            aventure = row['aventure']
             precision = f"{100 * correct / total:.2f}%"
             score = (1 + correct) / (1 + total)
-            scoreboard.append((score, precision, str(total), f"<@!{id}>"))
+            scoreboard.append(
+                (score, f"<@!{id}>", precision, str(total), f":fire:{survie}", f":fire:{aventure}"))
         scoreboard.sort(reverse = True)
 
         embed = discord.Embed()
         embed.add_field(
             name = "Utilisateur",
-            value = "\n".join(map(lambda row: row[3], scoreboard))
-        )
-        embed.add_field(
-            name = "Précision",
             value = "\n".join(map(lambda row: row[1], scoreboard))
         )
         embed.add_field(
-            name = "Total",
+            name = "Précision",
             value = "\n".join(map(lambda row: row[2], scoreboard))
         )
+        embed.add_field(
+            name = "Total",
+            value = "\n".join(map(lambda row: row[3], scoreboard))
+        )
 
+        embed.add_field(
+            name = "Utilisateur",
+            value = "\n".join(map(lambda row: row[1], scoreboard))
+        )
+        embed.add_field(
+            name = "Survie",
+            value = "\n".join(map(lambda row: row[4], scoreboard))
+        )
+        embed.add_field(
+            name = "Aventure",
+            value = "\n".join(map(lambda row: row[5], scoreboard))
+        )
         await interaction.response.send_message(
             "Scoreboard :",
             embed = embed,
