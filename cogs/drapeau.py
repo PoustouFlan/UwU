@@ -19,6 +19,9 @@ def pays_aleatoires(n: int):
     return sample(list(pays.items()), n)
 
 def drapeau(code: str):
+    """
+    Retourne l'image d'un drapeau sous la forme d'un object `File`
+    """
     filename = f"drapeaux/{code.lower()}.png"
     file = open(filename, 'rb')
     return discord.File(file, filename="drapeau.png")
@@ -69,19 +72,20 @@ class Drapeau(commands.Cog):
             file = file,
             view = view,
         )
+
         response = await interaction.original_response()
-        await asyncio.sleep(10)
+        await asyncio.sleep(15)
         answers = view.children[0].answers
         message = ""
+
         for user, answer in answers.items():
             if answer == correct[1]:
                 message += ":white_check_mark: | "
             else:
                 message += ":x: | "
             message += f"{user.mention} a répondu {answer}\n"
-        
+
         message += f":information_source: | La bonne réponse était {correct[1]}!"
-        
         await response.edit(
             content = message,
             view = None,
