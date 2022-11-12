@@ -21,24 +21,31 @@ def drapeau(code: str):
     return discord.File(file, filename="drapeau.png")
 
 class Select(discord.ui.Select):
-    def __init__(self, choix):
+    def __init__(self, choix, correct):
+        self.correct = correct
         pays = sorted(element[1] for element in choix)
         options = [
             discord.SelectOption(label=nom) for nom in pays
         ]
         placeholder = "Sélectionne le pays correspondant au drapeau"
         super().__init__(
-            placeholder=placeholder,
-            options=options
+            placeholder = placeholder,
+            max_values = 1,
+            min_values = 1,
+            options = options
         )
     
     async def callback(self, interaction):
-        pass
+        if self.values[0] == self.correct[1]:
+            message = "Bonne résponse !"
+        else:
+            message = f"Mauvaise réponse ! Il s'agissait de {self.correct[1]}."
+        await interaction.response.send_message(message, ephemeral=False)            
 
 class SelectView(discord.ui.View):
-    def __init__(self, choix):
+    def __init__(self, choix, correct):
         super().__init__()
-        self.add_item(Select(choix))
+        self.add_item(Select(choix, correct))
 
 class Drapeau(commands.Cog):
     def __init__(self, bot):
@@ -54,18 +61,11 @@ class Drapeau(commands.Cog):
     async def drapeau(self, interaction):
         choix = pays_aleatoires(15)
         correct = choice(choix)
-        file = drapeau(correct[0])
-        await interaction.response.send_message("", file = file, view = SelectView(choix))
+        await interaction.response.send_message(
+            "Quel est le pays correspondant à ce drapeau ?",
+            file = drapeau(correct[0]),
+            view = SelectView(choix, correct),
+        )
 
 async def setup(bot):
     await bot.add_cog(Drapeau(bot), guilds = [guild])
-# @bot.tree.command(name="drapeau", description="Fais deviner un unique drapeau", guild = guild)
-# async def drapeau(interaction):
-#     choix = drapeaux_aleatoires(2)
-#     correct = choice(choix)
-#     select = Select(
-#     )
-#     view = View()
-#     view.add_item(select)
-#     message = correct[0]
-#     await interaction.response.send_message(message, view = view)
