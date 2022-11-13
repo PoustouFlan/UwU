@@ -13,6 +13,10 @@ import asyncio
 
 with open("donnees/capitales.json", "r") as file:
     capitales = json.load(file)
+
+CODE = {}
+for cd, capitale in capitales.items():
+    CODE[capitale] = cd
     
 def capitales_aleatoires(n: int):
     """
@@ -74,7 +78,7 @@ class Capitale(commands.Cog):
                 increment_correct(user.id, "CAPITALES")
             else:
                 message += ":x: | "
-            message += f"{user.mention} a répondu : {answer}\n"
+            message += f"{user.mention} a répondu : {answer} ({pays[CODE[answer]]})\n"
 
         message += f":information_source: | La bonne réponse était {correct[1]}!"
         await response.edit(
