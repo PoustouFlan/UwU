@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from bot_utils import guild
-from db_utils import donnees
+from db_utils import donnees_pays
 
 class Scoreboard(commands.Cog):
     def __init__(self, bot):
@@ -18,7 +18,7 @@ class Scoreboard(commands.Cog):
     @app_commands.command(name="scoreboard", description="Révèle le tableau des scores du serveur")
     async def scoreboard(self, interaction):
         scoreboard = []
-        for row in donnees():
+        for row in donnees_pays():
             id = row['id']
             total = row['total']
             correct = row['correct']

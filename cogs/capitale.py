@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from bot_utils import guild
+from cogs.drapeau import drapeau, pays
 from db_utils import increment_correct, increment_total
 import json
 from random import choice, sample
@@ -10,35 +11,23 @@ from random import choice, sample
 from time import sleep
 import asyncio
 
-with open("donnees/pays.json", "r") as file:
-    pays = json.load(file)
-
-CODE = {}
-for cd, py in pays.items():
-    CODE[py] = cd
+with open("donnees/capitales.json", "r") as file:
+    capitales = json.load(file)
     
-def pays_aleatoires(n: int):
+def capitales_aleatoires(n: int):
     """
     Retourne une liste de n pays aléatoires
     """
-    return sample(list(pays.items()), n)
-
-def drapeau(code: str):
-    """
-    Retourne l'image d'un drapeau sous la forme d'un object `File`
-    """
-    filename = f"drapeaux/{code.lower()}.png"
-    file = open(filename, 'rb')
-    return discord.File(file, filename="drapeau.png")
+    return sample(list(capitales.items()), n)
 
 class Select(discord.ui.Select):
     def __init__(self, choix):
         self.answers = {}
-        pays = sorted(element[1] for element in choix)
+        capitales = sorted(element[1] for element in choix)
         options = [
-            discord.SelectOption(label=nom) for nom in pays
+            discord.SelectOption(label=nom) for nom in capitales
         ]
-        placeholder = "Sélectionne le pays correspondant au drapeau"
+        placeholder = "Sélectionne la capitale correspondant au pays"
         super().__init__(
             placeholder = placeholder,
             max_values = 1,
@@ -56,18 +45,19 @@ class SelectView(discord.ui.View):
         super().__init__()
         self.add_item(Select(choix))
 
-class Drapeau(commands.Cog):
+class Capitale(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @app_commands.command(name="drapeau", description="Fais deviner un unique drapeau")
-    async def drapeau(self, interaction):
-        choix = pays_aleatoires(15)
+    @app_commands.command(name="capitale", description="Fais deviner une unique capitale")
+    async def capitale(self, interaction):
+        choix = capitales_aleatoires(15)
         correct = choice(choix)
+        pays_correct = pays[correct[0]]
         file = drapeau(correct[0])
         view = SelectView(choix)
         await interaction.response.send_message(
-            ":thinking: Quel est le pays correspondant à ce drapeau ?",
+            f":thinking: Quel est la capitale de ce pays ? ({pays_correct})",
             file = file,
             view = view,
         )
@@ -78,14 +68,13 @@ class Drapeau(commands.Cog):
         message = ""
 
         for user, answer in answers.items():
-            increment_total(user.id, "PAYS")
+            increment_total(user.id, "CAPITALES")
             if answer == correct[1]:
                 message += ":white_check_mark: | "
-                increment_correct(user.id, "PAYS")
+                increment_correct(user.id, "CAPITALES")
             else:
                 message += ":x: | "
-            emote = f":flag_{CODE[answer].lower()}:"
-            message += f"{user.mention} a répondu : {emote} {answer}\n"
+            message += f"{user.mention} a répondu : {answer}\n"
 
         message += f":information_source: | La bonne réponse était {correct[1]}!"
         await response.edit(
@@ -94,4 +83,4 @@ class Drapeau(commands.Cog):
         )
 
 async def setup(bot):
-    await bot.add_cog(Drapeau(bot), guilds = [guild])
+    await bot.add_cog(Capitale(bot), guilds = [guild])

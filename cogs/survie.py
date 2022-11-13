@@ -30,19 +30,19 @@ class Select(discord.ui.Select):
     async def callback(self, interaction):
         response = await self.interaction.original_response()
         id = interaction.user.id
-        increment_total(id)
+        increment_total(id, "PAYS")
 
         if self.values[0] == self.correct[1]:
-            increment_correct(id)
-            increment_streak(id)
+            increment_correct(id, "PAYS")
+            increment_streak(id, "PAYS")
             message = ":white_check_mark: Correct !\n"
 
         else:
             message = f":x: Incorrect, la bonne réponse était {self.correct[1]} !\n"
-            decrement_vies(id)
+            decrement_vies(id, "PAYS")
 
-        vies = donnee(id, "VIES")
-        streak = donnee(id, "STREAK")
+        vies = donnee(id, "PAYS", "VIES")
+        streak = donnee(id, "PAYS", "STREAK")
 
         if vies <= 0:
             message += ":pensive: Vous êtes à court de vies !\n"
@@ -86,9 +86,9 @@ class Survie(commands.Cog):
 
         id = interaction.user.id
 
-        set_donnee(id, "START", vies)
-        set_donnee(id, "VIES", vies)
-        set_donnee(id, "STREAK", 0)
+        set_donnee(id, "PAYS", "START", vies)
+        set_donnee(id, "PAYS", "VIES", vies)
+        set_donnee(id, "PAYS", "STREAK", 0)
 
         choix = pays_aleatoires(25)
         correct = choice(choix)
@@ -104,7 +104,7 @@ class Survie(commands.Cog):
     @app_commands.command(name="continuer", description="Reprend une survie en cours de route")
     async def continuer(self, interaction):
         id = interaction.user.id
-        vies = donnee(id, "VIES")
+        vies = donnee(id, "PAYS", "VIES", None, 1)
         if vies <= 0:
             await interaction.response.send_message(
                 ":x: Vous n'avez pas de survie en cours !",

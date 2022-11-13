@@ -28,6 +28,7 @@ initial_extensions = [
     "cogs.drapeau",
     "cogs.survie",
     "cogs.scoreboard",
+    "cogs.capitale",
 ]
 
 print(initial_extensions)
