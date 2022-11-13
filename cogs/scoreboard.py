@@ -25,7 +25,7 @@ class Scoreboard(commands.Cog):
             survie = row['survie']
             aventure = row['aventure']
             precision = f"{100 * correct / total:.2f}%"
-            score = (1 + correct) / (1 + total)
+            score = (1 + correct) / (2 + total)
             scoreboard.append(
                 (score, f"<@!{id}>", precision, str(total), f":fire:{survie}", f":fire:{aventure}"))
         scoreboard.sort(reverse = True)
