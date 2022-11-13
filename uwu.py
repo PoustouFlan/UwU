@@ -29,6 +29,7 @@ initial_extensions = [
     "cogs.survie",
     "cogs.scoreboard",
     "cogs.capitale",
+    "cogs.survie-capitale",
 ]
 
 print(initial_extensions)
