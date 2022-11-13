@@ -83,6 +83,29 @@ def donnees_pays(conn = None):
     if to_close:
         conn.close()
 
+def donnees_capitales(conn = None):
+    to_close = conn is None
+    if to_close:
+        conn = connection()
+    
+    cursor = conn.execute(
+        """
+            SELECT ID, TOTAL, CORRECT, SURVIE, AVENTURE from CAPITALES
+        """
+    )
+
+    for row in cursor:
+        yield {
+            "id": row[0],
+            "total": row[1],
+            "correct": row[2],
+            "survie": row[3],
+            "aventure": row[4],
+        }
+    
+    if to_close:
+        conn.close()
+
 def donnee(id, table, colonne, conn = None, default = 0):
     to_close = conn is None
     if to_close:

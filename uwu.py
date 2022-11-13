@@ -30,9 +30,8 @@ initial_extensions = [
     "cogs.scoreboard",
     "cogs.capitale",
     "cogs.survie-capitale",
+    "cogs.scoreboard-capitale",
 ]
-
-print(initial_extensions)
 
 
 @bot.event
@@ -44,6 +43,7 @@ async def load():
     for extension in initial_extensions:
         try:
             await bot.load_extension(extension)
+            print(extension, " chargé avec succès !")
         except Exception as e:
             log.error(f"Failed to load extension {extension}")
             log.error(e)

@@ -3,22 +3,16 @@ from discord.ext import commands
 from discord import app_commands
 
 from bot_utils import guild
-from db_utils import donnees_pays
+from db_utils import donnees_capitales
 
-class Scoreboard(commands.Cog):
+class ScoreboardCapitale(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command()
-    async def sync(self, ctx):
-        fmt = await ctx.bot.tree.sync(guild=ctx.guild)
-        s = "" if fmt < 2 else "s"
-        await ctx.send(f"{len(fmt)} commande{s} synchronisée{s}.")
-    
-    @app_commands.command(name="scoreboard", description="Révèle le tableau des scores du serveur")
-    async def scoreboard(self, interaction):
+    @app_commands.command(name="scoreboard-capitale", description="Révèle le tableau des scores des capitales du serveur")
+    async def scoreboard_capitale(self, interaction):
         scoreboard = []
-        for row in donnees_pays():
+        for row in donnees_capitales():
             id = row['id']
             total = row['total']
             if total == 0:
@@ -65,4 +59,4 @@ class Scoreboard(commands.Cog):
         )
 
 async def setup(bot):
-    await bot.add_cog(Scoreboard(bot), guilds = [guild])
+    await bot.add_cog(ScoreboardCapitale(bot), guilds = [guild])
